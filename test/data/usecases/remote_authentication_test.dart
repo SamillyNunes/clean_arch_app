@@ -1,3 +1,4 @@
+import 'package:clean_arch/domain/helpers/helpers.dart';
 import 'package:faker/faker.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -35,6 +36,27 @@ void main() {
         method: 'post',
         body: {'email': params.email, 'password': params.secret},
       ));
+    },
+  );
+
+  test(
+    'Should throw UnexpectedError if HttpClient returns 400',
+    () async {
+      when(httpClient.request(
+              url: anyNamed('url'),
+              method: anyNamed('method'),
+              body: anyNamed('body')))
+          .thenThrow(HttpError.badRequest);
+
+      final params = AuthenticationParams(
+        email: faker.internet.email(),
+        secret: faker.internet.password(),
+      );
+      // acao
+      final future = sut.auth(params);
+
+      // thwrousA = comparar o erro q acontece dentro dela
+      expect(future, throwsA(DomainError.unexpected));
     },
   );
 }
