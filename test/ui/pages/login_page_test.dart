@@ -97,4 +97,48 @@ void main() {
       expect(find.text('any error'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'Should presents no error if email is valid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      emailErrorController.add(null);
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      final emailTextChildren = find.descendant(
+        of: find.bySemanticsLabel('Email'),
+        matching: find.byType(Text),
+      );
+
+      expect(
+        emailTextChildren,
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'Should presents no error if email is valid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      emailErrorController.add('');
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      final emailTextChildren = find.descendant(
+        of: find.bySemanticsLabel('Email'),
+        matching: find.byType(Text),
+      );
+
+      expect(
+        emailTextChildren,
+        findsOneWidget,
+      );
+    },
+  );
 }
