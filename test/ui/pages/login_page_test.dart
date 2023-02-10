@@ -13,11 +13,13 @@ void main() {
   LoginPresenter presenter;
   StreamController<String> emailErrorController;
   StreamController<String> passwordErrorController;
+  StreamController<bool> isFormValidController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
     passwordErrorController = StreamController<String>();
+    isFormValidController = StreamController<bool>();
 
     // Toda vez que nos testes for chamado o 'emailErrorStream' do presenter será respondido o
     // 'emailErrorStreamController.stream'
@@ -27,6 +29,9 @@ void main() {
     when(presenter.passwordErrorStream)
         .thenAnswer((_) => passwordErrorController.stream);
 
+    when(presenter.isFormValidStream)
+        .thenAnswer((_) => isFormValidController.stream);
+
     final loginPage = MaterialApp(home: LoginPage(presenter));
 
     await tester.pumpWidget(loginPage);
@@ -35,6 +40,7 @@ void main() {
   tearDown(() {
     emailErrorController.close();
     passwordErrorController.close();
+    isFormValidController.close();
   });
 
   testWidgets(
@@ -159,6 +165,66 @@ void main() {
       await tester.pump();
 
       expect(find.text('any error'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Should presents no error if email is valid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      passwordErrorController.add(null);
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      final passwordTextChildren = find.descendant(
+        of: find.bySemanticsLabel('Senha'),
+        matching: find.byType(Text),
+      );
+
+      expect(
+        passwordTextChildren,
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'Should presents no error if password is valid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      passwordErrorController.add('');
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      final passwordTextChildren = find.descendant(
+        of: find.bySemanticsLabel('Senha'),
+        matching: find.byType(Text),
+      );
+
+      expect(
+        passwordTextChildren,
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'Should enable form button if form is valid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      isFormValidController.add(true);
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      final button = tester.widget<RaisedButton>(find.byType(RaisedButton));
+
+      expect(button.onPressed, isNotNull);
     },
   );
 }
