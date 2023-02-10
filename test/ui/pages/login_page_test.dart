@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  Future<void> loadPage(WidgetTester tester) async {
+    final loginPage = MaterialApp(home: LoginPage());
+
+    await tester.pumpWidget(loginPage);
+  }
+
   testWidgets(
     'Should load with correct initial state',
     (WidgetTester tester) async {
-      final loginPage = MaterialApp(home: LoginPage());
-
-      await tester.pumpWidget(loginPage);
-
+      await loadPage(tester);
       // Encontra um descendente do campo email do tipo texto
       final emailTextChildren = find.descendant(
         of: find.bySemanticsLabel('Email'),
