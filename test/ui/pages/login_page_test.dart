@@ -12,15 +12,20 @@ class LoginPresenterSpy extends Mock implements LoginPresenter {}
 void main() {
   LoginPresenter presenter;
   StreamController<String> emailErrorController;
+  StreamController<String> passwordErrorController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
+    passwordErrorController = StreamController<String>();
 
     // Toda vez que nos testes for chamado o 'emailErrorStream' do presenter será respondido o
     // 'emailErrorStreamController.stream'
     when(presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
+
+    when(presenter.passwordErrorStream)
+        .thenAnswer((_) => passwordErrorController.stream);
 
     final loginPage = MaterialApp(home: LoginPage(presenter));
 
@@ -29,6 +34,7 @@ void main() {
 
   tearDown(() {
     emailErrorController.close();
+    passwordErrorController.close();
   });
 
   testWidgets(
@@ -139,6 +145,20 @@ void main() {
         emailTextChildren,
         findsOneWidget,
       );
+    },
+  );
+
+  testWidgets(
+    'Should presents error if password is invalid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      passwordErrorController.add('any error');
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      expect(find.text('any error'), findsOneWidget);
     },
   );
 }
