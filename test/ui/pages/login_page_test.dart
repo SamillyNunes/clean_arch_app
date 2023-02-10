@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clean_arch/ui/pages/login/login.dart';
 import 'package:clean_arch/ui/pages/pages.dart';
 import 'package:faker/faker.dart';
@@ -9,13 +11,25 @@ class LoginPresenterSpy extends Mock implements LoginPresenter {}
 
 void main() {
   LoginPresenter presenter;
+  StreamController<String> emailErrorController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
+    emailErrorController = StreamController<String>();
+
+    // Toda vez que nos testes for chamado o 'emailErrorStream' do presenter será respondido o
+    // 'emailErrorStreamController.stream'
+    when(presenter.emailErrorStream)
+        .thenAnswer((_) => emailErrorController.stream);
+
     final loginPage = MaterialApp(home: LoginPage(presenter));
 
     await tester.pumpWidget(loginPage);
   }
+
+  tearDown(() {
+    emailErrorController.close();
+  });
 
   testWidgets(
     'Should load with correct initial state',
@@ -67,6 +81,20 @@ void main() {
       await tester.enterText(find.bySemanticsLabel('Senha'), password);
 
       verify(presenter.validatePassword(password));
+    },
+  );
+
+  testWidgets(
+    'Should presents error if email is invalid',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      emailErrorController.add('any error');
+
+      // pra forcar os componentes que precisam ser renderizados novamente, como o caso de um setstate
+      await tester.pump();
+
+      expect(find.text('any error'), findsOneWidget);
     },
   );
 }
