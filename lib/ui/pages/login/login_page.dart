@@ -42,6 +42,7 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                         keyboardType: TextInputType.emailAddress,
+                        onChanged: presenter.validatePassword,
                       ),
                     ),
                     RaisedButton(
