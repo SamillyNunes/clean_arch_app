@@ -13,6 +13,7 @@ void main() {
   LoginPresenter presenter;
   StreamController<String> emailErrorController;
   StreamController<String> passwordErrorController;
+  StreamController<String> mainErrorController;
   StreamController<bool> isFormValidController;
   StreamController<bool> isLoadingController;
 
@@ -20,6 +21,7 @@ void main() {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
     passwordErrorController = StreamController<String>();
+    mainErrorController = StreamController<String>();
     isFormValidController = StreamController<bool>();
     isLoadingController = StreamController<bool>();
 
@@ -37,6 +39,9 @@ void main() {
     when(presenter.isLoadingStream)
         .thenAnswer((_) => isLoadingController.stream);
 
+    when(presenter.mainErrorStream)
+        .thenAnswer((_) => mainErrorController.stream);
+
     final loginPage = MaterialApp(home: LoginPage(presenter));
 
     await tester.pumpWidget(loginPage);
@@ -45,6 +50,7 @@ void main() {
   tearDown(() {
     emailErrorController.close();
     passwordErrorController.close();
+    mainErrorController.close();
     isFormValidController.close();
     isLoadingController.close();
   });
@@ -294,6 +300,19 @@ void main() {
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsNothing);
+    },
+  );
+  testWidgets(
+    'Should presents error messahe if auth fails',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      // Explicação: Manda mostrar primeiro e esconder depois pois simula o loading
+      // Já que no inicio ele estará falso e isso deixaria o teste tendencioso
+      mainErrorController.add('main error');
+      await tester.pump();
+
+      expect(find.text('main error'), findsOneWidget);
     },
   );
 }
