@@ -315,4 +315,15 @@ void main() {
       expect(find.text('main error'), findsOneWidget);
     },
   );
+  testWidgets(
+    'Should close streams on dispose',
+    (WidgetTester tester) async {
+      await loadPage(tester);
+
+      // Registra uma função que só vai ser acionada depois do teste
+      addTearDown(() {
+        verify(presenter.dispose()).called(1);
+      });
+    },
+  );
 }
