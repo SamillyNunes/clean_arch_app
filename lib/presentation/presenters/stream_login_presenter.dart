@@ -15,8 +15,9 @@ class StreamLoginPresenter {
 
   var _state = LoginState();
 
+  // O distinct soh emite valor se for diferente
   Stream<String> get emailErrorStream =>
-      _controller.stream.map((state) => state.emailError);
+      _controller.stream.map((state) => state.emailError).distinct();
 
   StreamLoginPresenter({@required this.validation});
 
