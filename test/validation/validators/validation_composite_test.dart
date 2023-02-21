@@ -11,7 +11,8 @@ class ValidationComposite implements Validation {
 
   String validate({@required String field, @required String value}) {
     String error;
-    for (final validation in validations) {
+    final specificValidators = validations.where((v) => v.field == field);
+    for (final validation in specificValidators) {
       error = validation.validate(value);
       if (error?.isNotEmpty == true) {
         return error;
@@ -47,14 +48,14 @@ void main() {
     // em produção seria utilizar sua implementação para retornar algo.
 
     validation1 = FieldValidationSpy();
-    when(validation1.field).thenReturn('any_field');
+    when(validation1.field).thenReturn('other_field');
     mockValidation1(null);
     validation2 = FieldValidationSpy();
     when(validation2.field).thenReturn('any_field');
     mockValidation2(null);
 
     validation3 = FieldValidationSpy();
-    when(validation3.field).thenReturn('other_field');
+    when(validation3.field).thenReturn('any_field');
     mockValidation3(null);
 
     sut = ValidationComposite([validation1, validation2, validation3]);
@@ -68,13 +69,15 @@ void main() {
     expect(error, null);
   });
 
-  test('Should return first error if all validations returns error', () {
+  test(
+      'Should return first error if all validations of the specific field returns error',
+      () {
     mockValidation1('error 1');
     mockValidation2('error 2');
     mockValidation3('error 3');
 
     final error = sut.validate(field: 'any_field', value: 'any_value');
 
-    expect(error, 'error 1');
+    expect(error, 'error 2');
   });
 }
