@@ -1,26 +1,8 @@
-import 'package:clean_arch/presentation/protocols/protocols.dart';
-import 'package:clean_arch/validation/protocols/protocols.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:meta/meta.dart';
 
-class ValidationComposite implements Validation {
-  final List<FieldValidation> validations;
-
-  ValidationComposite(this.validations);
-
-  String validate({@required String field, @required String value}) {
-    String error;
-    final specificValidators = validations.where((v) => v.field == field);
-    for (final validation in specificValidators) {
-      error = validation.validate(value);
-      if (error?.isNotEmpty == true) {
-        return error;
-      }
-    }
-    return error;
-  }
-}
+import 'package:clean_arch/validation/protocols/protocols.dart';
+import 'package:clean_arch/validation/validators/validators.dart';
 
 class FieldValidationSpy extends Mock implements FieldValidation {}
 
