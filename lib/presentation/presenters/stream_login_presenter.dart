@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:clean_arch/domain/helpers/helpers.dart';
 import 'package:clean_arch/domain/usecases/usecases.dart';
+import 'package:clean_arch/ui/pages/login/login.dart';
 import 'package:meta/meta.dart';
 
 import 'package:clean_arch/presentation/protocols/protocols.dart';
@@ -21,7 +22,7 @@ class LoginState {
       password != null;
 }
 
-class StreamLoginPresenter {
+class StreamLoginPresenter implements LoginPresenter {
   final Validation validation;
   final Authentication authentication;
   // Com o broadcast haverá mais de um listener em um mesmo controlador
