@@ -23,6 +23,7 @@ class App extends StatelessWidget {
         // Vantagem de usar o factory desta maneira: As varias dependencias de kd pagina
         // só será carrega quando a página for acessada
         GetPage(name: '/login', page: makeLoginPage),
+        GetPage(name: '/surveys', page: () => Scaffold(body: Text('Enquetes'))),
       ],
     );
   }

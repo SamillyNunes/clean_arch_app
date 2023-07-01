@@ -18,6 +18,7 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
   var _emailError = RxString();
   var _passwordError = RxString();
   var _mainError = RxString();
+  var _navigateTo = RxString();
 
   // Atalho para criar um RxBool so que com um valor default
   var _isFormValid = false.obs;
@@ -29,6 +30,8 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
   Stream<String> get passwordErrorStream => _passwordError.stream;
 
   Stream<String> get mainErrorStream => _mainError.stream;
+
+  Stream<String> get navigateToStream => _navigateTo.stream;
 
   Stream<bool> get isFormValidStream => _isFormValid.stream;
 
@@ -69,6 +72,11 @@ class GetxLoginPresenter extends GetxController implements LoginPresenter {
         AuthenticationParams(email: _email, secret: _password),
       );
       await saveCurrentAccount.save(account);
+
+      // Porque nao colocar a navegacao direta aqui?
+      // Porque isso deve ser feito na UI. O presentation deve ser livre de frameworks, nesse caso o flutter,
+      // e para navegar diretamente precisaria importar o framework aqui
+      _navigateTo.value = '/surveys';
     } on DomainError catch (error) {
       _mainError.value = error.description;
       _isLoading.value = false;
